@@ -125,6 +125,12 @@ int read_file_write_mem (uint16_t arr[], char *file) {
 
     // Iterate through each line in the file
     while (getline(in, line)) {
+        if (line[0] == '@') {
+            // Get address
+            line = line.substr(1);
+            count = stoul (line, nullptr, 16);
+            continue;
+        }
         // Read hex string as integer
         uint16_t curinstr = stoul (line, nullptr, 16);
 
