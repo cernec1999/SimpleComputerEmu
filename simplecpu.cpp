@@ -22,6 +22,7 @@ using namespace std;
  *
  *  @param argc The number of arguments in the program
  *  @param argv The character array holding the arguments
+ *  @return If the program ran successfully
  */
 int main(int argc, char **argv) {
 
@@ -42,9 +43,7 @@ int main(int argc, char **argv) {
         return 0;
     }
 
-    int count = 0;
-
-    while (running && count < 2560) {
+    while (running) {
         branch_control();
 
         // get the current instruction
@@ -75,8 +74,6 @@ int main(int argc, char **argv) {
         if (RW) {
             reg[DA] = out;
         }
-
-        count++;
     }
 
     print_memory(64);
@@ -87,6 +84,11 @@ int main(int argc, char **argv) {
 
 /**
  *  Gets a range of bits for the instruction decoder
+ *
+ *  @param num The number to use
+ *  @param high The higher bound of the range
+ *  @param low The lower bound of the range
+ *  @return The result of the operation (in the least significant part)
  */
 uint16_t bit_range (uint16_t num, int high, int low) {
     return (num >> low) & ~(0b1111111111111111 << (high - low + 1));
@@ -98,6 +100,7 @@ uint16_t bit_range (uint16_t num, int high, int low) {
  *
  *  @param arr The data array to write to
  *  @param file The file to read from
+ *  @return int If the write was successful
  */
 int read_file_write_mem (uint16_t arr[], char *file) {
     ifstream in(file);
@@ -197,7 +200,7 @@ void instruction_decoder() {
 }
 
 /**
- *  Debug information
+ *  Prints the variables processed by the instruction decoder
  */
 void print_decoder_output() {
     printf("DA: %d, AA: %d, BA: %d\n", DA, AA, BA);
@@ -206,30 +209,36 @@ void print_decoder_output() {
 }
 
 /**
- *  Debug information
+ *  Prints the memory of the program in its current execution state
+ *
+ *  @param num How many addresses we want to print
  */
 void print_memory(int num) {
     printf("Printing %d pieces of memory...\n", num);
     for (int i = 0; i < num; i++) {
-        printf("0x%x: %x\n", i, memory[i]);
+        printf("0x%x:\t0x%x\n", i, memory[i]);
     }
 }
 
 
 /**
- *  Debug information
+ *  Prints the registers of the program in its current execution state
  */
 void print_reg() {
     printf("Printing registers\n");
     for (int i = 0; i < 8; i++) {
-        printf("R%d: %x\n", i, reg[i]);
+        printf("R%d:\t0x%x\n", i, reg[i]);
     }
 }
 
 
 
 /**
- *  Function unit
+ *  Processes the function unit instructions
+ *
+ *  @param A The A operand
+ *  @param B The B operand
+ *  @return The result of the operation
  */
 uint16_t function_unit(uint16_t A, uint16_t B) {
    uint16_t out = 0;
