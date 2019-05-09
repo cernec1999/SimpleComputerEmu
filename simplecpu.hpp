@@ -71,7 +71,8 @@ uint16_t BA, AA, DA;
 bool reset = true;
 bool running = true;
 
-uint16_t bit_range (uint16_t num, int high, int low);
+uint16_t get_bit_range (uint16_t num, int high, int low);
+bool get_bit (uint16_t num, int bit);
 int read_file_write_mem (uint16_t arr[], char *file);
 void branch_control();
 void instruction_decoder();

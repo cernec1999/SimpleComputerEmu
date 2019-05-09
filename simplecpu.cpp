@@ -90,8 +90,20 @@ int main(int argc, char **argv) {
  *  @param low The lower bound of the range
  *  @return The result of the operation (in the least significant part)
  */
-uint16_t bit_range (uint16_t num, int high, int low) {
+uint16_t get_bit_range (uint16_t num, int high, int low) {
     return (num >> low) & ~(0b1111111111111111 << (high - low + 1));
+}
+
+
+/**
+ *  Gets one bit and returns the LSB as a boolean
+ *
+ *  @param num The number to use
+ *  @param bit The bit to get
+ *  @return bool The result
+ */
+bool get_bit (uint16_t num, int bit) {
+    return (bool) get_bit_range(num, bit, bit);
 }
 
 
@@ -169,30 +181,27 @@ void branch_control() {
 
 
 /**
- *  Interprets instructions
+ *  Interprets instructions using logic operations
  */
 void instruction_decoder() {
-    // DEBUG: print current instr
-
-
     // set registers
-    DA = bit_range(reg[IR], 8, 6);
-    AA = bit_range(reg[IR], 5, 3);
-    BA = bit_range(reg[IR], 2, 0);
+    DA = get_bit_range(reg[IR], 8, 6);
+    AA = get_bit_range(reg[IR], 5, 3);
+    BA = get_bit_range(reg[IR], 2, 0);
 
     // get bit values
-    MB = bit_range(reg[IR], 15, 15);
-    MD = bit_range(reg[IR], 13, 13);
-    RW = !((bool) bit_range(reg[IR], 14, 14));
-    MW = !((bool) bit_range(reg[IR], 15, 15)) && ((bool) bit_range(reg[IR], 14, 14));
-    PL = bit_range(reg[IR], 15, 15) & bit_range(reg[IR], 14, 14);
+    MB = get_bit(reg[IR], 15);
+    MD = get_bit(reg[IR], 13);
+    RW = !get_bit(reg[IR], 14);
+    MW = !MB && get_bit(reg[IR], 14);
+    PL = MB && get_bit(reg[IR], 14);
     JB = MD;
-    BC = bit_range(reg[IR], 9, 9);
+    BC = get_bit(reg[IR], 9);
 
     // Take care of function select
-    FS = bit_range(reg[IR], 12, 9);
+    FS = get_bit_range(reg[IR], 12, 9);
 
-    // If PL, clear the LSB
+    // If PL, clear the LSB of FS
     if (PL) {
         FS &= ~1;
     }
@@ -293,7 +302,7 @@ uint16_t function_unit(uint16_t A, uint16_t B) {
         case 14:
             out = B << 1;
             break;
-        // This statement is used for debugging purposes. Address 1E00
+        // This statement is used for debugging purposes. Instr: 0x1E00
         case 15:
             print_memory(A);
             print_reg();
@@ -307,7 +316,7 @@ uint16_t function_unit(uint16_t A, uint16_t B) {
     reg[STATUS] = 0;
 
     // check MSB to see if it is negative
-    if (bit_range (out, 15, 15))
+    if (get_bit_range (out, 15, 15))
         reg[STATUS] |= FL_N;
 
     if (out == 0)
