@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
         return 0;
     }
 
-    printf("Simple computer initializing...\n");
+    printf("Simple computer initializing... ");
 
     // Read in instruction memory and data memory
     int res_instr = read_file_write_mem(instr, argv[1]);
@@ -42,6 +42,8 @@ int main(int argc, char **argv) {
         printf("There was a problem reading the instruciton or data memory files.\n");
         return 0;
     }
+
+    printf("Program memory read successfully. Computer is running.\n\n");
 
     while (running) {
         branch_control();
@@ -75,8 +77,6 @@ int main(int argc, char **argv) {
             reg[DA] = out;
         }
     }
-
-    print_memory(64);
 
     return 0;
 }
@@ -213,11 +213,13 @@ void print_decoder_output() {
  *
  *  @param num How many addresses we want to print
  */
-void print_memory(int num) {
-    printf("Printing %d pieces of memory...\n", num);
+void print_memory(uint16_t num) {
+    printf("Printing %d locations in memory...\n", num);
     for (int i = 0; i < num; i++) {
         printf("0x%x:\t0x%x\n", i, memory[i]);
     }
+
+    printf("\n");
 }
 
 
@@ -225,10 +227,12 @@ void print_memory(int num) {
  *  Prints the registers of the program in its current execution state
  */
 void print_reg() {
-    printf("Printing registers\n");
+    printf("Printing registers...\n");
     for (int i = 0; i < 8; i++) {
         printf("R%d:\t0x%x\n", i, reg[i]);
     }
+
+    printf("\n");
 }
 
 
@@ -289,9 +293,11 @@ uint16_t function_unit(uint16_t A, uint16_t B) {
         case 14:
             out = B << 1;
             break;
+        // This statement is used for debugging purposes. Address 1E00
         case 15:
-            running = false;
-            out = A;
+            print_memory(A);
+            print_reg();
+            out = reg[DA];
             break;
         default:
             out = A;

@@ -76,6 +76,6 @@ int read_file_write_mem (uint16_t arr[], char *file);
 void branch_control();
 void instruction_decoder();
 void print_decoder_output();
-void print_memory(int);
+void print_memory(uint16_t);
 void print_reg();
 uint16_t function_unit(uint16_t operand_A, uint16_t operand_B);
