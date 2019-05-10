@@ -43,9 +43,11 @@ int main(int argc, char **argv) {
         return 0;
     }
 
+    program_size = res_instr;
+
     printf("Program memory read successfully. Computer is running.\n\n");
 
-    while (running) {
+    while (reg[PC] < program_size) {
         branch_control();
 
         // get the current instruction
@@ -77,6 +79,8 @@ int main(int argc, char **argv) {
             reg[DA] = out;
         }
     }
+
+    printf("Program execution has finished.\n");
 
     return 0;
 }
@@ -139,7 +143,7 @@ int read_file_write_mem (uint16_t arr[], char *file) {
         count ++;
     }
 
-    return 1;
+    return count;
 }
 
 
@@ -322,7 +326,7 @@ uint16_t function_unit(uint16_t A, uint16_t B) {
     reg[STATUS] = 0;
 
     // check MSB to see if it is negative
-    if (get_bit_range (out, 15, 15))
+    if (get_bit (out, 15))
         reg[STATUS] |= FL_N;
 
     if (out == 0)
